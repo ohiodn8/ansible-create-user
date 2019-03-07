@@ -1,6 +1,7 @@
 ## Ansible Playbook for T2
 - hosts: local
-  become: true
+  become: yes
+  become_method: sudo
 
   tasks:
   - name: SE LINUX SET 0
@@ -15,7 +16,7 @@
       group: users
       state: present
       comment: "Ansible User"
-      password: "chorus"
+      password: "$6$RHTjKED49oQMiA3f$TTxmMc9yJZffrPIdIun1CoMpr312Wt6HqlQ.JZB0rIq4ew1CLPU0sT09jpH8GWH67x1U8nzAJQhzAwrk6d7rM1"
 
   - name: Add a public ssh key to user
     authorized_key:

@@ -1,5 +1,5 @@
 ## Ansible Playbook to get OS Version
-- hosts: redhat
+- hosts: local
 
   tasks:
   - name: Gather Version
