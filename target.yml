@@ -1,0 +1,8 @@
+## Ansible Playbook to get OS Version
+- hosts: redhat
+
+  tasks:
+  - name: Gather Version
+    debug:
+     msg: "The server Operating system is {{ ansible_distribution }} {{ ansible_distribution_major_version }}"
+     

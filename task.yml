@@ -1,0 +1,53 @@
+## Ansible Playbook for T2
+- hosts: local
+  become: true
+
+  tasks:
+  - name: SE LINUX SET 0
+    when: ansible_os_family == "RedHat"
+    selinux:
+      policy: targeted
+      state: permissive
+
+  - name: Create user
+    user:
+      name: chorus
+      group: users
+      state: present
+      comment: "Ansible User"
+      password: "chorus"
+
+  - name: Add a public ssh key to user
+    authorized_key:
+      user: chorus
+      state: present
+      manage_dir: yes
+      key: "{{ lookup('file', '/home/ubuntu/.ssh/id_rsa.pub') }}"
+      path: /home/chorus/.ssh/authorized_keys
+
+
+  - name: Add a passwordless sudo entry in sudoers
+    lineinfile:
+      dest: /etc/sudoers
+      backup: yes
+      state: present
+      regexp: 'chorus\s'
+      line: 'chorus ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+
+  - name: Add ansible user to whitelist
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      backup: yes
+      backrefs: yes
+      state: present
+      regexp: '^(AllowUsers(?!.*\bchorus\b).*)$'
+      line: '\1 chorus'
+    register: sshd_config
+
+  - name: Restart ssh service
+    service:
+      name: sshd
+      state: restarted
+    when: sshd_config.changed
+
