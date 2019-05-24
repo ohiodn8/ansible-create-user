@@ -18,10 +18,10 @@
       regexp: 'userchorus\s'
       validate: 'visudo -cf %s'
 
-  - name: Remove User from AllowGroup and AllowUsers
+  - name: Remove User from AllowGroup and AllowUsers in sshd config
     replace:
       regexp: "userchorus"
-      backup: True
+      backup: yes
       path: /etc/ssh/sshd_config
       replace: "\b"
 
