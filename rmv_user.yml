@@ -1,14 +1,12 @@
-## Chorus Playbook to Delete Accounts
-- hosts: webservers
+## PLAYBOOK TO DELETE SINGLE USER ACCOUNT
+- hosts: webserver
   become: yes
   become_method: sudo
 
   tasks:
-  - name: Remove User Account _ Jenkins
+  - name: Remove User Account
     user:
-      name: chorus
-      group: users
-      comment: "Chorus user"
+      name: userchorus
       state: absent
       remove: yes
 
@@ -17,22 +15,17 @@
       dest: /etc/sudoers
       backup: yes
       state: absent
-      regexp: 'chorus\s'
-      line: 'chorus ALL=(ALL) NOPASSWD: ALL'
+      regexp: 'userchorus\s'
       validate: 'visudo -cf %s'
 
-  - name: Remove Chorus User to whitelist
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      backup: yes
-      backrefs: yes
-      state: absent
-      regexp: '^(AllowUsers(?!.*\bchorus\b).*)$'
-      line: '\1 chorus'
-    register: sshd_config
+  - name: Remove User from AllowGroup and AllowUsers
+    replace:
+      regexp: "userchorus"
+      backup: True
+      path: /etc/ssh/sshd_config
+      replace: "\b"
 
   - name: Restart ssh service
     service:
       name: sshd
       state: restarted
-    when: sshd_config.changed
