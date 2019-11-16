@@ -1,0 +1,19 @@
+- hosts: sample
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+  - name: Patch
+    yum:
+      name: '*'
+      state: latest
+
+  - name: reStart
+    command: /sbin/shutdown -r +1
+
+  - name: Wait for the reboot to complete
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 5
+      timeout: 600
